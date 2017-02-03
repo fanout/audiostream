@@ -1,0 +1,11 @@
+Django==1.10.5
+PyJWT==1.4.2
+argparse==1.2.1
+django-grip==1.7.0
+gripcontrol==2.4.2
+pubcontrol==2.2.7
+pyzmq==16.0.2
+requests==2.13.0
+tnetstring==0.2.1
+wsgiref==0.1.2
+zmq==0.0.0

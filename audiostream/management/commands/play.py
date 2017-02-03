@@ -21,7 +21,7 @@ def _publish_worker():
 		buf += data
 		if len(buf) >= 16384:
 			m = {
-				'channel': 'music',
+				'channel': 'audio',
 				'formats': {
 					'http-stream': {
 						'content': buf
@@ -32,7 +32,7 @@ def _publish_worker():
 			buf = ''
 
 def _play(filename):
-	subprocess.check_call(['gst-launch-1.0', 'filesrc', 'location=%s' % filename, '!', 'decodebin', '!', 'queue', '!', 'lamemp3enc', '!', 'udpsink', 'clients=localhost:5004'])
+	subprocess.check_call(['gst-launch-1.0', 'filesrc', 'location=%s' % filename, '!', 'decodebin', '!', 'queue', '!', 'audioconvert', '!', 'lamemp3enc', '!', 'udpsink', 'clients=localhost:5004'])
 
 class Command(BaseCommand):
 	help = 'Background cleanup task'

@@ -3,4 +3,4 @@ from django_grip import set_hold_stream
 
 def home(request):
 	set_hold_stream(request, 'audio')
-	return HttpResponse()
+	return HttpResponse(content_type='audio/mpeg')

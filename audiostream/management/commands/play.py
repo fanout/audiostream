@@ -4,9 +4,12 @@ import threading
 import subprocess
 import zmq
 import tnetstring
+import redis
 from django.core.management.base import BaseCommand
 
 zmq_context = zmq.Context()
+
+r = redis.Redis()
 
 def _play(filename):
 	subprocess.check_call(['gst-launch-1.0', 'filesrc', 'location=%s' % filename, '!', 'decodebin', '!', 'queue', '!', 'audioconvert', '!', 'lamemp3enc', '!', 'udpsink', 'clients=localhost:5004'])
@@ -54,10 +57,19 @@ def _publish_worker(cond):
 			buf += msg[1]
 			packets += 1
 
-		if (msg[0] == 'flush' and packets > 0) or packets >= 40:
+		if (msg[0] == 'flush' and packets > 0) or packets >= 10:
+			with r.pipeline() as pipe:
+				pipe.multi()
+				pipe.lpush('bufs', buf)
+				pipe.ltrim('bufs', 0, 15)
+				pipe.execute()
+
 			_publish_chunk(out_sock, buf)
 			buf = ''
 			packets = 0
+
+		if msg[0] == 'flush':
+			r.delete('bufs')
 
 class Command(BaseCommand):
 	help = 'Background cleanup task'
@@ -80,6 +92,8 @@ class Command(BaseCommand):
 
 		sock = zmq_context.socket(zmq.PUSH)
 		sock.connect('inproc://input')
+
+		r.delete('bufs')
 
 		while True:
 			_play(options['filename'])

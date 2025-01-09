@@ -12,7 +12,7 @@ zmq_context = zmq.Context()
 r = redis.Redis()
 
 def _play(filename):
-	subprocess.check_call(['gst-launch-1.0', 'filesrc', 'location=%s' % filename, '!', 'decodebin', '!', 'queue', '!', 'audioconvert', '!', 'lamemp3enc', '!', 'udpsink', 'clients=localhost:5004'])
+	subprocess.check_call(['gst-launch-1.0', 'filesrc', 'location=%s' % filename, '!', 'decodebin', '!', 'queue', '!', 'audioconvert', '!', 'lamemp3enc', '!', 'udpsink', 'clients=127.0.0.1:5004'])
 
 def _publish_chunk(sock, data):
 	m = {

@@ -93,7 +93,13 @@ class Command(BaseCommand):
 		sock = zmq_context.socket(zmq.PUSH)
 		sock.connect('inproc://input')
 
-		r.delete('bufs')
+		# ensure redis has started
+		while True:
+			try:
+				r.delete('bufs')
+				break
+			except Exception:
+				time.sleep(5)
 
 		while True:
 			_play(options['filename'])
